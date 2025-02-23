@@ -22,19 +22,21 @@ function App() {
     },
   ])
 
-  const [post, setPost] = React.useState({ title: '', body: '' })
-
-  function addNewPost(e) {
-    e.preventDefault()
-
-    setPosts([...posts, { ...post, id: Date.now() }])
-    setPost({ title: '', body: '' })
+  function createPost(ppp) {
+    setPosts([...posts, ppp])
   }
 
+  function removePost(post) {
+    setPosts(posts.filter((item) => item.id !== post.id))
+  }
   return (
     <div className="App">
-      <PostForm posts={posts} setPosts={setPosts} />
-      <PostList posts={posts} />
+      <PostForm create={createPost} />
+      {posts.length > 0 ? (
+        <PostList remove={removePost} posts={posts} />
+      ) : (
+        <h1 style={{ textAlign: 'center' }}>Постов нет</h1>
+      )}
     </div>
   )
 }
