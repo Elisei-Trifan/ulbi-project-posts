@@ -2,7 +2,7 @@ import React from 'react'
 import './styles/app.css'
 import PostList from './components/PostList'
 import PostForm from './components/PostForm'
-import MySelect from './components/UI/select/MySelect'
+import PostFilter from './components/PostFilter'
 
 function App() {
   const [posts, setPosts] = React.useState([
@@ -23,7 +23,23 @@ function App() {
     },
   ])
 
-  const [selectedSort, setSelectedSort] = React.useState('')
+  const [filter, setFilter] = React.useState({ sort: '', query: '' })
+
+  const sortedPosts = React.useMemo(() => {
+    console.log('ЕСть фаза')
+    if (filter.sort) {
+      return [...posts].sort((a, b) =>
+        a[filter.sort].localeCompare(b[filter.sort])
+      )
+    }
+    return posts
+  }, [filter.sort, posts])
+
+  const sortedAndSearchedPosts = React.useMemo(() => {
+    return sortedPosts.filter((item) =>
+      item.title.toLowerCase().includes(filter.query.toLowerCase())
+    )
+  }, [filter.query, sortedPosts])
 
   function createPost(ppp) {
     setPosts([...posts, ppp])
@@ -33,33 +49,13 @@ function App() {
     setPosts(posts.filter((item) => item.id !== post.id))
   }
 
-  function sortPosts(sort) {
-    setSelectedSort(sort)
-    console.log(sort)
-    setPosts([...posts].sort((a, b) => a[sort].localeCompare(b[sort])))
-  }
-
   return (
     <div className="App">
       <PostForm create={createPost} />
       <hr style={{ margin: '15px 0' }} />
-      <MySelect
-        value={selectedSort}
-        selected={sortPosts}
-        defaultValue="Сортировка"
-        options={[
-          {
-            value: 'title',
-            name: 'По названию',
-          },
-          {
-            value: 'body',
-            name: 'По описанию',
-          },
-        ]}
-      />
-      {posts.length > 0 ? (
-        <PostList remove={removePost} posts={posts} />
+      <PostFilter filter={filter} setFilter={setFilter} />
+      {sortedAndSearchedPosts.length ? (
+        <PostList remove={removePost} posts={sortedAndSearchedPosts} />
       ) : (
         <h1 style={{ textAlign: 'center' }}>Постов нет</h1>
       )}
