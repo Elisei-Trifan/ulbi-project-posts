@@ -3,6 +3,8 @@ import './styles/app.css'
 import PostList from './components/PostList'
 import PostForm from './components/PostForm'
 import PostFilter from './components/PostFilter'
+import MyModal from './components/UI/modal/MyModal'
+import MyButton from './components/UI/button/MyButton'
 
 function App() {
   const [posts, setPosts] = React.useState([
@@ -24,6 +26,7 @@ function App() {
   ])
 
   const [filter, setFilter] = React.useState({ sort: '', query: '' })
+  const [modal, setModal] = React.useState(false)
 
   const sortedPosts = React.useMemo(() => {
     console.log('ЕСть фаза')
@@ -43,6 +46,7 @@ function App() {
 
   function createPost(ppp) {
     setPosts([...posts, ppp])
+    setModal(false)
   }
 
   function removePost(post) {
@@ -51,14 +55,15 @@ function App() {
 
   return (
     <div className="App">
-      <PostForm create={createPost} />
+      <MyButton style={{ marginTop: '30px' }} onClick={() => setModal(true)}>
+        Создать пост
+      </MyButton>
+      <MyModal visible={modal} setVisible={setModal}>
+        <PostForm create={createPost} />
+      </MyModal>
       <hr style={{ margin: '15px 0' }} />
       <PostFilter filter={filter} setFilter={setFilter} />
-      {sortedAndSearchedPosts.length ? (
-        <PostList remove={removePost} posts={sortedAndSearchedPosts} />
-      ) : (
-        <h1 style={{ textAlign: 'center' }}>Постов нет</h1>
-      )}
+      <PostList remove={removePost} posts={sortedAndSearchedPosts} />
     </div>
   )
 }
